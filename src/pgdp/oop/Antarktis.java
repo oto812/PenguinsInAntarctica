@@ -9,6 +9,7 @@ public class Antarktis extends Maze {
     private static LeopardSeal[] leopardSeals = new LeopardSeal[20];
     private static Fish[] fishes = new Fish[500];
     private static PlayerPenguin playerPenguin;
+    private static boolean end = false;
 
     public static void main(String[] args) {
         width = 41;
@@ -16,21 +17,77 @@ public class Antarktis extends Maze {
         antarktis = generateMaze(width, height);
 
         // Close the opnend frame
+        setupMaze();
+        Animal.antarktis = antarktis;
+        gameLoop();
         closeFrame();
     }
 
     private static void gameLoop() {
-        while (false) {
-            // TODO maybe
+        while (true) {
             draw();
-            // TODO maybe
+            while (currentEvent == NOTHING) {
+                draw();
+            }
+
+            moveAll();
+            if (end){
+                end = false;
+                return;
+            }
             currentEvent = NOTHING;
-            // TODO maybe
         }
     }
 
+
     private static void moveAll() {
-        // TODO
+
+        switch (currentEvent) {
+            case 1:
+                if(playerPenguin.move((playerPenguin.x-1), playerPenguin.y)) {
+                    end = true;
+                    return;
+                }
+                break;
+            case 2:
+                if(playerPenguin.move(playerPenguin.x, (playerPenguin.y-1))) {
+                    end = true;
+                    return;
+                }
+                break;
+            case 3:
+                if(playerPenguin.move((playerPenguin.x+1), playerPenguin.y)) {
+                    end = true;
+                    return;
+                }
+                break;
+            case 4:
+                if(playerPenguin.move(playerPenguin.x, (playerPenguin.y + 1))){
+                    end = true;
+                    return;
+                }
+                break;
+            case -1:
+                currentEvent = NOTHING;
+                break;
+        }
+
+
+        for (int i = 0; i < whales.length; i++) {
+            whales[i].move();
+            if(!lostPenguin.alive || !playerPenguin.alive){
+                end = true;
+                return;
+            }
+        }
+        for (int i = 0; i < leopardSeals.length; i++) {
+                leopardSeals[i].move();
+        }
+        lostPenguin.move();
+        for (int i = 0; i < fishes.length; i++) {
+                fishes[i].move();
+        }
+
     }
 
     /**

@@ -14,6 +14,9 @@ public abstract class Animal {
   static String filename;
   protected File f;
   protected Image image;
+  protected boolean alive = true;
+  protected boolean IsPenguinAlive = true;
+
 
   protected static Animal[][] antarktis;
 
@@ -21,11 +24,113 @@ public abstract class Animal {
     this.x = x;
     this.y = y;
   }
+  public abstract boolean IsPenguin();
+  public abstract boolean IsLeopard();
 
-  public void move() {
-    // TODO
+
+
+
+
+  public boolean canStay(int y, int x) {
+    int left = x - 1 >= 0 ? x - 1 : 40;
+    int up = y - 1 >= 0 ? y - 1 : 40;
+    int right = x + 1 <= 40 ? x + 1 : 0;
+    int down = y + 1 <= 40 ? y + 1 : 0;
+
+    if (antarktis[left][y] != null){
+      if (antarktis[left][y].canEat(this)){
+        return false;
+      }
+    }else if (antarktis[right][y] != null){
+      if (antarktis[right][y].canEat(this)){
+        return false;
+      }
+    }else if (antarktis[x][up] != null){
+      if (antarktis[x][up].canEat(this)){
+        return false;
+      }
+    }else if (antarktis[x][down] != null){
+      if (antarktis[x][down].canEat(this)){
+        return false;
+      }
+    }
+    return true;
   }
 
+  public void move() {
+    if (alive) {
+      int left = x - 1 >= 0 ? x - 1 : 40;
+      int up = y - 1 >= 0 ? y - 1 : 40;
+      int right = x + 1 <= 40 ? x + 1 : 0;
+      int down = y + 1 <= 40 ? y + 1 : 0;
+      if(antarktis[left][y] != null) {
+        if (this.canEat(antarktis[left][y]) && canStay(y, left)) {
+          antarktis[x][y] = null;
+          if (antarktis[left][y].IsPenguin()) {
+            IsPenguinAlive = false;
+          }
+          antarktis[left][y].alive = false;
+          antarktis[left][y] = this;
+          x = left;
+          return;
+        }
+      }
+      if (antarktis[x][up] != null) {
+        if (this.canEat(antarktis[x][up]) && canStay(x, up)) {
+          antarktis[x][y] = null;
+          if (antarktis[x][up].IsPenguin()) {
+            IsPenguinAlive = false;
+          }
+          antarktis[x][up].alive = false;
+          antarktis[x][up] = this;
+          y = up;
+          return;
+        }
+      }
+      if (antarktis[right][y] != null) {
+        if (this.canEat(antarktis[right][y]) && canStay(y, right)) {
+          antarktis[x][y] = null;
+          if (antarktis[right][y].IsPenguin()) {
+            IsPenguinAlive = false;
+          }
+          antarktis[right][y].alive = false;
+          antarktis[right][y] = this;
+          x = right;
+          return;
+        }
+      }
+      if (antarktis[x][down] != null) {
+        if (this.canEat(antarktis[x][down]) && canStay(down, x)) {
+          antarktis[x][y] = null;
+          if (antarktis[x][down].IsPenguin()) {
+            IsPenguinAlive = false;
+          }
+          antarktis[x][down].alive = false;
+          antarktis[x][down] = this;
+
+          y = down;
+          return;
+        }
+      }
+      if (antarktis[left][y] == null && canStay(y, left)) {
+        antarktis[left][y] = this;
+        antarktis[x][y] = null;
+        x = left;
+      }else if (antarktis[x][up] == null && canStay(up, x)) {
+        antarktis[x][up] = this;
+        antarktis[x][y] = null;
+        y = up;
+      }else if (antarktis[right][y] == null && canStay(y, right)) {
+        antarktis[right][y] = this;
+        antarktis[x][y] = null;
+        x = right;
+      }else if (antarktis[x][down] == null && canStay(down, x)) {
+        antarktis[x][down] = this;
+        antarktis[x][y] = null;
+        y = down;
+      }
+    }
+  }
   public abstract boolean canEat(Animal animal);
 
   protected abstract boolean eatenBy(Penguin penguin);
@@ -33,6 +138,8 @@ public abstract class Animal {
   protected abstract boolean eatenBy(Whale whale);
   protected abstract boolean eatenBy(LeopardSeal leopardSeal);
   protected abstract boolean eatenBy(Fish fish);
+
+
 
   public static void setAntarktis(Animal[][] antarktis) {
     Animal.antarktis = antarktis;
